@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Загадки проклятого аукциона</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Карточка локации */
+        .location-card {
+            background: #16213e;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .location-image {
+            width: 100%;
+            height: 200px;
+            background: #0f3460;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
+            overflow: hidden;
+        }
+
+        .location-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .location-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #e94560;
+        }
+
+        .location-description {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        /* Очки дедукции */
+        .deduction-bar {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deduction-score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f9a826;
+        }
+
+        .deduction-buy {
+            background: #e94560;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Карточки улик */
+        .cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #0f3460;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .card:hover {
+            transform: translateX(4px);
+        }
+
+        .card.discovered {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .card-image {
+            width: 80px;
+            height: 80px;
+            background: #1a1a2e;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #888;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-type {
+            font-size: 12px;
+            color: #f9a826;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .card-text {
+            font-size: 14px;
+            color: #bbb;
+            line-height: 1.4;
+        }
+
+        .card-cost {
+            font-size: 12px;
+            color: #e94560;
+            margin-top: 8px;
+        }
+
+        /* Кнопки выбора */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: #e94560;
+            border: none;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .action-btn.disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        /* Модальное окно (детали карточки) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #16213e;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 24px;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 200px;
+            background: #0f3460;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .modal-close {
+            background: #e94560;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 40px;
+            width: 100%;
+            margin-top: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app"></div>
+
+<script>
+    // ==================== JSON СЮЖЕТ ====================
+    const GAME_DATA = {
+        "game_id": "mystery_auction_ep1",
+        "title": "Проклятый аукцион",
+        "start_location": "ballroom",
+        "deduction_points": 100,
+        "locations": {
+            "ballroom": {
+                "name": "Бальный зал",
+                "background_image": "https://i.ibb.co/ch0jNpkN/Gemini-Generated-Image-tighqytighqytigh.png",
+                "description": "Огромный зал в викторианском стиле. Люстра мерцает, по стенам танцуют тени. В центре — тело сэра Генри. Вокруг разбросаны вещи.",
+                "cards": [
+                    {
+                        "id": "clue_glove",
+                        "type": "улика",
+                        "image": "https://i.ibb.co/3ykPP9ds/Gemini-Generated-Image-2peopc2peopc2peo.png",
+                        "title": "Старая перчатка",
+                        "text": "Мужская перчатка из тонкой кожи. На пальце — свежие чернильные пятна и вышитая монограмма 'L.W.'",
+                        "deduction_cost": 5,
+                        "is_discovered": false
+                    },
+                    {
+                        "id": "clue_catalog",
+                        "type": "улика",
+                        "image": "https://i.ibb.co/PGYh0wDV/Gemini-Generated-Image-lzpbw7lzpbw7lzpb.png",
+                        "title": "Аукционный каталог",
+                        "text": "Программа торгов. Лот №7 'Зеркало Морфея' обведен красными чернилами. Рядом приписка: 'Никому не отдам — L.W.'",
+                        "deduction_cost": 5,
+                        "is_discovered": false
+                    },
+                    {
+                        "id": "npc_chatter",
+                        "type": "свидетель",
+                        "image": "https://i.ibb.co/N6N4LSWM/Gemini-Generated-Image-vo9aiqvo9aiqvo9a.png",
+                        "title": "Дрожащий дворецкий",
+                        "text": "Старый дворецкий шепчет: 'Мистер Уэбстер из библиотеки враждовал с сэром Генри. Говорили, зеркало должно было достаться ему...'",
+                        "deduction_cost": 10,
+                        "is_discovered": false
+                    }
+                ],
+                "buttons": [
+                    {
+                        "text": "🔍 Идти в библиотеку к Уэбстеру",
+                        "next_location": "library",
+                        "required_clues": ["clue_glove", "clue_catalog"]
+                    },
+                    {
+                        "text": "📜 Обыскать кабинет аукциониста",
+                        "next_location": "office",
+                        "required_clues": []
+                    }
+                ]
+            },
+            "library": {
+                "name": "Библиотека",
+                "background_image": null,
+                "description": "Комната временно недоступна. Следующая локация в разработке.",
+                "cards": [],
+                "buttons": [
+                    {
+                        "text": "🔙 Вернуться в бальный зал",
+                        "next_location": "ballroom",
+                        "required_clues": []
+                    }
+                ]
+            },
+            "office": {
+                "name": "Кабинет аукциониста",
+                "background_image": null,
+                "description": "Комната временно недоступна. Следующая локация в разработке.",
+                "cards": [],
+                "buttons": [
+                    {
+                        "text": "🔙 Вернуться в бальный зал",
+                        "next_location": "ballroom",
+                        "required_clues": []
+                    }
+                ]
+            }
+        }
+    };
+
+    // ==================== СОСТОЯНИЕ ИГРЫ ====================
+    let gameState = {
+        currentLocation: GAME_DATA.start_location,
+        deductionPoints: GAME_DATA.deduction_points,
+        discoveredCards: new Set()
+    };
+
+    // Сохранение состояния в localStorage
+    function saveGame() {
+        const toSave = {
+            currentLocation: gameState.currentLocation,
+            deductionPoints: gameState.deductionPoints,
+            discoveredCards: Array.from(gameState.discoveredCards)
+        };
+        localStorage.setItem('detective_game_save', JSON.stringify(toSave));
+    }
+
+    // Загрузка сохранения
+    function loadGame() {
+        const saved = localStorage.getItem('detective_game_save');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                gameState.currentLocation = data.currentLocation;
+                gameState.deductionPoints = data.deductionPoints;
+                gameState.discoveredCards = new Set(data.discoveredCards);
+                
+                // Синхронизируем статус карточек в GAME_DATA
+                for (const locId in GAME_DATA.locations) {
+                    for (const card of GAME_DATA.locations[locId].cards) {
+                        card.is_discovered = gameState.discoveredCards.has(card.id);
+                    }
+                }
+            } catch(e) { console.log("Ошибка загрузки сохранения"); }
+        }
+    }
+
+    // Сброс игры
+    function resetGame() {
+        gameState.currentLocation = GAME_DATA.start_location;
+        gameState.deductionPoints = GAME_DATA.deduction_points;
+        gameState.discoveredCards.clear();
+        for (const locId in GAME_DATA.locations) {
+            for (const card of GAME_DATA.locations[locId].cards) {
+                card.is_discovered = false;
+            }
+        }
+        saveGame();
+        renderGame();
+    }
+
+    // Проверка, можно ли открыть карточку
+    function canDiscoverCard(card) {
+        return !card.is_discovered && gameState.deductionPoints >= card.deduction_cost;
+    }
+
+    // Открытие карточки
+    function discoverCard(card) {
+        if (!canDiscoverCard(card)) return false;
+        
+        gameState.deductionPoints -= card.deduction_cost;
+        card.is_discovered = true;
+        gameState.discoveredCards.add(card.id);
+        saveGame();
+        renderGame();
+        showModal(card);
+        return true;
+    }
+
+    // Переход в локацию
+    function goToLocation(locationId) {
+        if (GAME_DATA.locations[locationId]) {
+            gameState.currentLocation = locationId;
+            saveGame();
+            renderGame();
+        }
+    }
+
+    // Показать модальное окно с карточкой
+    function showModal(card) {
+        const modal = document.getElementById('modal');
+        if (!modal) {
+            // Создаём модальное окно, если его нет
+            createModal();
+        }
+        const modalCard = document.getElementById('modal-card');
+        if (modalCard) {
+            modalCard.innerHTML = `
+                ${card.image ? `<div class="modal-image"><img src="${card.image}" alt=""></div>` : '<div class="modal-image">🖼️ Изображение</div>'}
+                <div class="card-type">${card.type}</div>
+                <h3>${card.title}</h3>
+                <p>${card.text}</p>
+            `;
+        }
+        document.getElementById('modal')?.classList.add('active');
+    }
+
+    function createModal() {
+        const modalDiv = document.createElement('div');
+        modalDiv.id = 'modal';
+        modalDiv.className = 'modal';
+        modalDiv.innerHTML = `
+            <div class="modal-content" id="modal-card">
+                <div class="modal-image">🖼️ Загрузка...</div>
+                <button class="modal-close">Закрыть</button>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        modalDiv.querySelector('.modal-close').onclick = () => {
+            modalDiv.classList.remove('active');
+        };
+        modalDiv.onclick = (e) => {
+            if (e.target === modalDiv) modalDiv.classList.remove('active');
+        };
+    }
+
+    // Проверка, все ли обязательные улики собраны
+    function haveRequiredClues(requiredIds) {
+        if (!requiredIds || requiredIds.length === 0) return true;
+        return requiredIds.every(id => gameState.discoveredCards.has(id));
+    }
+
+    // Отрисовка игры
+    function renderGame() {
+        const app = document.getElementById('app');
+        const location = GAME_DATA.locations[gameState.currentLocation];
+        
+        if (!location) {
+            app.innerHTML = '<div class="location-card">Ошибка: локация не найдена</div>';
+            return;
+        }
+
+        let html = `
+            <div class="deduction-bar">
+                <span>🕵️ Очки дедукции</span>
+                <span class="deduction-score">${gameState.deductionPoints}</span>
+                <button class="deduction-buy" id="buyStarsBtn">⭐ Купить очки</button>
+            </div>
+            <div class="location-card">
+                <div class="location-image">
+                    ${location.background_image ? `<img src="${location.background_image}" alt="">` : '🏛️ ' + location.name}
+                </div>
+                <div class="location-name">${location.name}</div>
+                <div class="location-description">${location.description}</div>
+            </div>
+        `;
+
+        // Карточки (улики)
+        if (location.cards && location.cards.length > 0) {
+            html += `<div class="cards-grid">`;
+            for (const card of location.cards) {
+                const canOpen = canDiscoverCard(card);
+                html += `
+                    <div class="card ${card.is_discovered ? 'discovered' : ''}" data-card-id="${card.id}">
+                        <div class="card-image">${card.image ? `<img src="${card.image}" alt="">` : '📋'}</div>
+                        <div class="card-content">
+                            <div class="card-type">${card.type}</div>
+                            <div class="card-title">${card.title}</div>
+                            <div class="card-text">${card.is_discovered ? card.text : '??? Нажмите, чтобы исследовать'}</div>
+                            ${!card.is_discovered ? `<div class="card-cost">🔍 Стоимость: ${card.deduction_cost} очков</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            html += `</div>`;
+        } else {
+            html += `<div class="location-card"><p style="text-align:center; color:#888;">Здесь пока нет улик для исследования</p></div>`;
+        }
+
+        // Кнопки действий
+        if (location.buttons && location.buttons.length > 0) {
+            html += `<div class="action-buttons">`;
+            for (const btn of location.buttons) {
+                const hasClues = haveRequiredClues(btn.required_clues);
+                const disabledClass = !hasClues ? 'disabled' : '';
+                const disabledAttr = !hasClues ? 'disabled' : '';
+                html += `
+                    <button class="action-btn ${disabledClass}" data-next="${btn.next_location}" ${disabledAttr}>
+                        ${btn.text} ${!hasClues ? '(🔒 Требуются улики)' : ''}
+                    </button>
+                `;
+            }
+            html += `</div>`;
+        }
+
+        // Кнопка сброса
+        html += `
+            <div style="margin-top: 20px; text-align: center;">
+                <button id="resetGameBtn" style="background: none; border: 1px solid #555; color: #888; padding: 8px 16px; border-radius: 20px; cursor: pointer;">🔄 Начать заново</button>
+            </div>
+        `;
+
+        app.innerHTML = html;
+
+        // Навешиваем обработчики
+        document.querySelectorAll('.card').forEach(cardEl => {
+            const cardId = cardEl.dataset.cardId;
+            const foundCard = location.cards.find(c => c.id === cardId);
+            if (foundCard && !foundCard.is_discovered) {
+                cardEl.onclick = () => discoverCard(foundCard);
+            }
+        });
+
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            if (!btn.disabled) {
+                btn.onclick = () => {
+                    const next = btn.dataset.next;
+                    if (next) goToLocation(next);
+                };
+            }
+        });
+
+        const resetBtn = document.getElementById('resetGameBtn');
+        if (resetBtn) resetBtn.onclick = resetGame;
+
+        const buyStarsBtn = document.getElementById('buyStarsBtn');
+        if (buyStarsBtn) {
+            buyStarsBtn.onclick = () => {
+                alert('Здесь будет интеграция с FunPay для покупки очков за Telegram Stars');
+            };
+        }
+    }
+
+    // Telegram WebApp интеграция (если открыто внутри Telegram)
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // разворачиваем на весь экран
+        tg.ready();
+    }
+
+    // Запуск игры
+    loadGame();
+    renderGame();
+    createModal(); // создаём модальное окно заранее
+</script>
+<!-- Подключаем Telegram WebApp SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</body>
+</html>
