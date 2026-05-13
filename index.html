@@ -24,6 +24,53 @@
             margin: 0 auto;
         }
 
+        /* Стартовый экран */
+        .start-screen {
+            background: #16213e;
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e94560;
+            margin-bottom: 16px;
+        }
+
+        .story-text {
+            text-align: left;
+            margin: 20px 0;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .rules-list {
+            text-align: left;
+            background: #0f3460;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .rules-list li {
+            margin: 10px 0;
+            margin-left: 20px;
+        }
+
+        .start-btn {
+            background: #e94560;
+            border: none;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
         /* Карточка локации */
         .location-card {
             background: #16213e;
@@ -129,8 +176,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            color: #888;
+            font-size: 30px;
             overflow: hidden;
         }
 
@@ -193,7 +239,18 @@
             cursor: not-allowed;
         }
 
-        /* Модальное окно (детали карточки) */
+        .reset-btn {
+            background: none;
+            border: 1px solid #555;
+            color: #888;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* Модальное окно */
         .modal {
             display: none;
             position: fixed;
@@ -220,18 +277,6 @@
             padding: 24px;
         }
 
-        .modal-image {
-            width: 100%;
-            height: 200px;
-            background: #0f3460;
-            border-radius: 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
         .modal-close {
             background: #e94560;
             border: none;
@@ -248,44 +293,59 @@
 <div class="container" id="app"></div>
 
 <script>
-    // ==================== JSON СЮЖЕТ ====================
+    // ==================== СЮЖЕТ И ПРАВИЛА ====================
+    const STORY = {
+        title: "Загадки проклятого аукциона",
+        opening: "Лондон, 1888 год. Полночь. Вы — известный артефакт-детектив, получивший анонимное приглашение на закрытый аукцион в особняке сэра Генри Блэквуда. Когда вы прибываете, вместо оживлённых торгов вас встречает мёртвая тишина... и тело самого сэра Генри.\n\nЗеркало Морфея — легендарный артефакт, способный показывать самые страшные сны — исчезло. Гости впали в летаргию. А вы — единственный, кто может раскрыть тайну и вернуть зеркало.",
+        rules: [
+            "У вас есть 100 очков дедукции в начале игры.",
+            "Каждая улика или свидетельство стоят определённое количество очков.",
+            "Чтобы перейти в новую локацию, иногда нужно собрать все улики.",
+            "Очки можно пополнить за Telegram Stars (кнопка «Купить очки»).",
+            "Ваша цель — найти преступника и вернуть Зеркало Морфея."
+        ]
+    };
+
+    // ==================== JSON СЮЖЕТ ИГРЫ ====================
     const GAME_DATA = {
         "game_id": "mystery_auction_ep1",
-        "title": "Проклятый аукцион",
         "start_location": "ballroom",
         "deduction_points": 100,
         "locations": {
             "ballroom": {
                 "name": "Бальный зал",
-                "background_image": "https://i.ibb.co/ch0jNpkN/Gemini-Generated-Image-tighqytighqytigh.png",
+                "background_image": null,
                 "description": "Огромный зал в викторианском стиле. Люстра мерцает, по стенам танцуют тени. В центре — тело сэра Генри. Вокруг разбросаны вещи.",
                 "cards": [
                     {
                         "id": "clue_glove",
                         "type": "улика",
-                        "image": "https://i.ibb.co/3ykPP9ds/Gemini-Generated-Image-2peopc2peopc2peo.png",
+                        "image": null,
                         "title": "Старая перчатка",
                         "text": "Мужская перчатка из тонкой кожи. На пальце — свежие чернильные пятна и вышитая монограмма 'L.W.'",
                         "deduction_cost": 5,
-                        "is_discovered": false
+                        "is_discovered": false,
+                        "icon": "🧤"
                     },
                     {
                         "id": "clue_catalog",
                         "type": "улика",
-                        "image": "https://i.ibb.co/PGYh0wDV/Gemini-Generated-Image-lzpbw7lzpbw7lzpb.png",
+                        "image": null,
                         "title": "Аукционный каталог",
                         "text": "Программа торгов. Лот №7 'Зеркало Морфея' обведен красными чернилами. Рядом приписка: 'Никому не отдам — L.W.'",
                         "deduction_cost": 5,
-                        "is_discovered": false
+                        "is_discovered": false,
+                        "icon": "📖"
                     },
                     {
                         "id": "npc_chatter",
                         "type": "свидетель",
-                        "image": "https://i.ibb.co/N6N4LSWM/Gemini-Generated-Image-vo9aiqvo9aiqvo9a.png",
+                        "image": null,
                         "title": "Дрожащий дворецкий",
                         "text": "Старый дворецкий шепчет: 'Мистер Уэбстер из библиотеки враждовал с сэром Генри. Говорили, зеркало должно было достаться ему...'",
                         "deduction_cost": 10,
-                        "is_discovered": false
+                        "is_discovered": false,
+                        "icon": "👤"
                     }
                 ],
                 "buttons": [
@@ -293,20 +353,51 @@
                         "text": "🔍 Идти в библиотеку к Уэбстеру",
                         "next_location": "library",
                         "required_clues": ["clue_glove", "clue_catalog"]
-                    },
-                    {
-                        "text": "📜 Обыскать кабинет аукциониста",
-                        "next_location": "office",
-                        "required_clues": []
                     }
                 ]
             },
             "library": {
                 "name": "Библиотека",
                 "background_image": null,
-                "description": "Комната временно недоступна. Следующая локация в разработке.",
-                "cards": [],
+                "description": "Гигантская комната, полная книг до потолка. Камин почти погас. В кресле у камина сидит мистер Уэбстер и нервно листает какую-то книгу. Увидев вас, он вздрагивает.",
+                "cards": [
+                    {
+                        "id": "clue_letter",
+                        "type": "улика",
+                        "image": null,
+                        "title": "Письмо с угрозами",
+                        "text": "В столе Уэбстера найдено письмо: 'Я требую вернуть мне Зеркало. Оно принадлежало моей семье. Вы украли его, сэр Генри. Я заберу его любой ценой. — Л.Уэбстер'",
+                        "deduction_cost": 10,
+                        "is_discovered": false,
+                        "icon": "📜"
+                    },
+                    {
+                        "id": "clue_key",
+                        "type": "улика",
+                        "image": null,
+                        "title": "Старый ключ",
+                        "text": "Под креслом Уэбстера блестит старый бронзовый ключ. На табличке выгравировано: 'Секретная комната — кабинет аукциониста'.",
+                        "deduction_cost": 5,
+                        "is_discovered": false,
+                        "icon": "🔑"
+                    },
+                    {
+                        "id": "npc_webster",
+                        "type": "подозреваемый",
+                        "image": null,
+                        "title": "Мистер Уэбстер",
+                        "text": "Уэбстер запинается: 'Я... я не убивал его! Зеркало... да, я хотел его вернуть. Но когда я пришёл сюда вечером, сэр Генри уже был мёртв! Я взял каталог, но нашёл только перчатку... Кто-то был здесь до меня!'",
+                        "deduction_cost": 15,
+                        "is_discovered": false,
+                        "icon": "👨‍⚖️"
+                    }
+                ],
                 "buttons": [
+                    {
+                        "text": "🗝️ Открыть секретную комнату в кабинете",
+                        "next_location": "office",
+                        "required_clues": ["clue_key"]
+                    },
                     {
                         "text": "🔙 Вернуться в бальный зал",
                         "next_location": "ballroom",
@@ -317,29 +408,86 @@
             "office": {
                 "name": "Кабинет аукциониста",
                 "background_image": null,
-                "description": "Комната временно недоступна. Следующая локация в разработке.",
-                "cards": [],
+                "description": "Секретная комната за книжным шкафом. Стол аукциониста завален бумагами. В углу — пустой пьедестал, на котором, вероятно, стояло Зеркало. Рядом — свежие следы.",
+                "cards": [
+                    {
+                        "id": "clue_footprints",
+                        "type": "улика",
+                        "image": null,
+                        "title": "Следы",
+                        "text": "На полу — свежие грязные следы. Они ведут к окну. Размер обуви — мужской, примерно 42-го.",
+                        "deduction_cost": 5,
+                        "is_discovered": false,
+                        "icon": "👣"
+                    },
+                    {
+                        "id": "clue_ledger",
+                        "type": "улика",
+                        "image": null,
+                        "title": "Долговая тетрадь",
+                        "text": "На столе аукциониста — тетрадь с долгами. Сэр Генри задолжал крупную сумму таинственному 'Покупателю X'. Последняя запись: 'Верну долг Зеркалом'.",
+                        "deduction_cost": 10,
+                        "is_discovered": false,
+                        "icon": "📓"
+                    }
+                ],
                 "buttons": [
                     {
-                        "text": "🔙 Вернуться в бальный зал",
-                        "next_location": "ballroom",
+                        "text": "🏆 Завершить расследование и назвать преступника",
+                        "next_location": "finale",
+                        "required_clues": ["clue_footprints", "clue_ledger", "clue_letter"]
+                    },
+                    {
+                        "text": "🔙 Вернуться в библиотеку",
+                        "next_location": "library",
                         "required_clues": []
                     }
                 ]
+            },
+            "finale": {
+                "name": "Финал",
+                "background_image": null,
+                "description": "Вы собрали все улики. Теперь пришло время назвать преступника. Кто же убил сэра Генри и украл Зеркало Морфея?",
+                "cards": [],
+                "buttons": [
+                    {
+                        "text": "👨‍⚖️ Мистер Уэбстер — он хотел вернуть семейную реликвию",
+                        "next_location": "end",
+                        "required_clues": []
+                    },
+                    {
+                        "text": "💰 Аукционист — он задолжал деньги и украл Зеркало",
+                        "next_location": "end",
+                        "required_clues": []
+                    },
+                    {
+                        "text": "🕵️ Дворецкий — он знал все ходы и выходы",
+                        "next_location": "end",
+                        "required_clues": []
+                    }
+                ]
+            },
+            "end": {
+                "name": "Конец игры",
+                "background_image": null,
+                "description": "Это финал. Чтобы начать заново, нажмите кнопку ниже.",
+                "cards": [],
+                "buttons": []
             }
         }
     };
 
     // ==================== СОСТОЯНИЕ ИГРЫ ====================
     let gameState = {
+        gameStarted: false,
         currentLocation: GAME_DATA.start_location,
         deductionPoints: GAME_DATA.deduction_points,
         discoveredCards: new Set()
     };
 
-    // Сохранение состояния в localStorage
     function saveGame() {
         const toSave = {
+            gameStarted: gameState.gameStarted,
             currentLocation: gameState.currentLocation,
             deductionPoints: gameState.deductionPoints,
             discoveredCards: Array.from(gameState.discoveredCards)
@@ -347,17 +495,16 @@
         localStorage.setItem('detective_game_save', JSON.stringify(toSave));
     }
 
-    // Загрузка сохранения
     function loadGame() {
         const saved = localStorage.getItem('detective_game_save');
         if (saved) {
             try {
                 const data = JSON.parse(saved);
+                gameState.gameStarted = data.gameStarted || false;
                 gameState.currentLocation = data.currentLocation;
                 gameState.deductionPoints = data.deductionPoints;
                 gameState.discoveredCards = new Set(data.discoveredCards);
                 
-                // Синхронизируем статус карточек в GAME_DATA
                 for (const locId in GAME_DATA.locations) {
                     for (const card of GAME_DATA.locations[locId].cards) {
                         card.is_discovered = gameState.discoveredCards.has(card.id);
@@ -367,8 +514,8 @@
         }
     }
 
-    // Сброс игры
     function resetGame() {
+        gameState.gameStarted = false;
         gameState.currentLocation = GAME_DATA.start_location;
         gameState.deductionPoints = GAME_DATA.deduction_points;
         gameState.discoveredCards.clear();
@@ -377,16 +524,14 @@
                 card.is_discovered = false;
             }
         }
-        saveGame();
-        renderGame();
+        localStorage.removeItem('detective_game_save');
+        render();
     }
 
-    // Проверка, можно ли открыть карточку
     function canDiscoverCard(card) {
         return !card.is_discovered && gameState.deductionPoints >= card.deduction_cost;
     }
 
-    // Открытие карточки
     function discoverCard(card) {
         if (!canDiscoverCard(card)) return false;
         
@@ -394,65 +539,74 @@
         card.is_discovered = true;
         gameState.discoveredCards.add(card.id);
         saveGame();
-        renderGame();
+        render();
         showModal(card);
         return true;
     }
 
-    // Переход в локацию
     function goToLocation(locationId) {
         if (GAME_DATA.locations[locationId]) {
             gameState.currentLocation = locationId;
             saveGame();
-            renderGame();
+            render();
         }
     }
 
-    // Показать модальное окно с карточкой
     function showModal(card) {
         const modal = document.getElementById('modal');
-        if (!modal) {
-            // Создаём модальное окно, если его нет
-            createModal();
+        if (modal) {
+            document.getElementById('modal-title').textContent = card.title;
+            document.getElementById('modal-text').textContent = card.text;
+            document.getElementById('modal-type').textContent = card.type;
+            document.getElementById('modal-icon').textContent = card.icon || '📋';
+            modal.classList.add('active');
         }
-        const modalCard = document.getElementById('modal-card');
-        if (modalCard) {
-            modalCard.innerHTML = `
-                ${card.image ? `<div class="modal-image"><img src="${card.image}" alt=""></div>` : '<div class="modal-image">🖼️ Изображение</div>'}
-                <div class="card-type">${card.type}</div>
-                <h3>${card.title}</h3>
-                <p>${card.text}</p>
-            `;
-        }
-        document.getElementById('modal')?.classList.add('active');
     }
 
-    function createModal() {
-        const modalDiv = document.createElement('div');
-        modalDiv.id = 'modal';
-        modalDiv.className = 'modal';
-        modalDiv.innerHTML = `
-            <div class="modal-content" id="modal-card">
-                <div class="modal-image">🖼️ Загрузка...</div>
-                <button class="modal-close">Закрыть</button>
-            </div>
-        `;
-        document.body.appendChild(modalDiv);
-        modalDiv.querySelector('.modal-close').onclick = () => {
-            modalDiv.classList.remove('active');
-        };
-        modalDiv.onclick = (e) => {
-            if (e.target === modalDiv) modalDiv.classList.remove('active');
-        };
+    function closeModal() {
+        document.getElementById('modal')?.classList.remove('active');
     }
 
-    // Проверка, все ли обязательные улики собраны
     function haveRequiredClues(requiredIds) {
         if (!requiredIds || requiredIds.length === 0) return true;
         return requiredIds.every(id => gameState.discoveredCards.has(id));
     }
 
-    // Отрисовка игры
+    // Стартовый экран
+    function renderStartScreen() {
+        const app = document.getElementById('app');
+        let rulesHtml = '<ul class="rules-list">';
+        for (const rule of STORY.rules) {
+            rulesHtml += `<li>${rule}</li>`;
+        }
+        rulesHtml += '</ul>';
+        
+        app.innerHTML = `
+            <div class="start-screen">
+                <div class="game-title">${STORY.title}</div>
+                <div class="story-text">${STORY.opening.replace(/\n/g, '<br>')}</div>
+                ${rulesHtml}
+                <button class="start-btn" id="startGameBtn">🕵️ Начать расследование</button>
+                <button class="reset-btn" id="hardResetBtn">🔄 Сбросить сохранения</button>
+            </div>
+        `;
+        
+        document.getElementById('startGameBtn').onclick = () => {
+            gameState.gameStarted = true;
+            saveGame();
+            render();
+        };
+        
+        const hardResetBtn = document.getElementById('hardResetBtn');
+        if (hardResetBtn) {
+            hardResetBtn.onclick = () => {
+                localStorage.clear();
+                location.reload();
+            };
+        }
+    }
+
+    // Основная игра
     function renderGame() {
         const app = document.getElementById('app');
         const location = GAME_DATA.locations[gameState.currentLocation];
@@ -470,21 +624,20 @@
             </div>
             <div class="location-card">
                 <div class="location-image">
-                    ${location.background_image ? `<img src="${location.background_image}" alt="">` : '🏛️ ' + location.name}
+                    ${location.background_image ? `<img src="${location.background_image}" alt="">` : `🏛️ ${location.name}`}
                 </div>
                 <div class="location-name">${location.name}</div>
                 <div class="location-description">${location.description}</div>
             </div>
         `;
 
-        // Карточки (улики)
         if (location.cards && location.cards.length > 0) {
             html += `<div class="cards-grid">`;
             for (const card of location.cards) {
                 const canOpen = canDiscoverCard(card);
                 html += `
                     <div class="card ${card.is_discovered ? 'discovered' : ''}" data-card-id="${card.id}">
-                        <div class="card-image">${card.image ? `<img src="${card.image}" alt="">` : '📋'}</div>
+                        <div class="card-image">${card.icon || '📋'}</div>
                         <div class="card-content">
                             <div class="card-type">${card.type}</div>
                             <div class="card-title">${card.title}</div>
@@ -495,19 +648,15 @@
                 `;
             }
             html += `</div>`;
-        } else {
-            html += `<div class="location-card"><p style="text-align:center; color:#888;">Здесь пока нет улик для исследования</p></div>`;
         }
 
-        // Кнопки действий
         if (location.buttons && location.buttons.length > 0) {
             html += `<div class="action-buttons">`;
             for (const btn of location.buttons) {
                 const hasClues = haveRequiredClues(btn.required_clues);
                 const disabledClass = !hasClues ? 'disabled' : '';
-                const disabledAttr = !hasClues ? 'disabled' : '';
                 html += `
-                    <button class="action-btn ${disabledClass}" data-next="${btn.next_location}" ${disabledAttr}>
+                    <button class="action-btn ${disabledClass}" data-next="${btn.next_location}" ${!hasClues ? 'disabled' : ''}>
                         ${btn.text} ${!hasClues ? '(🔒 Требуются улики)' : ''}
                     </button>
                 `;
@@ -515,16 +664,14 @@
             html += `</div>`;
         }
 
-        // Кнопка сброса
-        html += `
-            <div style="margin-top: 20px; text-align: center;">
-                <button id="resetGameBtn" style="background: none; border: 1px solid #555; color: #888; padding: 8px 16px; border-radius: 20px; cursor: pointer;">🔄 Начать заново</button>
-            </div>
-        `;
+        if (gameState.currentLocation !== 'end') {
+            html += `<button class="reset-btn" id="resetGameBtn">🔄 Сбросить прогресс и начать заново</button>`;
+        } else {
+            html += `<button class="reset-btn" id="restartGameBtn">🎮 Начать новую игру</button>`;
+        }
 
         app.innerHTML = html;
 
-        // Навешиваем обработчики
         document.querySelectorAll('.card').forEach(cardEl => {
             const cardId = cardEl.dataset.cardId;
             const foundCard = location.cards.find(c => c.id === cardId);
@@ -537,6 +684,14 @@
             if (!btn.disabled) {
                 btn.onclick = () => {
                     const next = btn.dataset.next;
+                    if (next === 'end') {
+                        const finalText = btn.textContent;
+                        let finalMessage = '';
+                        if (finalText.includes('Уэбстер')) finalMessage = 'Вы обвиняете мистера Уэбстера. Он признаётся, что хотел вернуть зеркало, но клянётся, что не убивал. Следы ведут к другому...';
+                        else if (finalText.includes('Аукционист')) finalMessage = 'Вы обвиняете аукциониста. Он сознаётся в краже зеркала, но клянётся, что сэр Генри был жив, когда он уходил.';
+                        else finalMessage = 'Вы обвиняете дворецкого. Он падает на колени и признаётся во всём! Это он убил сэра Генри и украл зеркало. Дело раскрыто!';
+                        alert(finalMessage + '\n\nИгра пройдена! Спасибо за расследование.');
+                    }
                     if (next) goToLocation(next);
                 };
             }
@@ -544,28 +699,53 @@
 
         const resetBtn = document.getElementById('resetGameBtn');
         if (resetBtn) resetBtn.onclick = resetGame;
+        
+        const restartBtn = document.getElementById('restartGameBtn');
+        if (restartBtn) restartBtn.onclick = resetGame;
 
         const buyStarsBtn = document.getElementById('buyStarsBtn');
         if (buyStarsBtn) {
             buyStarsBtn.onclick = () => {
-                alert('Здесь будет интеграция с FunPay для покупки очков за Telegram Stars');
+                alert('⭐ Покупка очков дедукции за Telegram Stars\n\nФункция будет доступна после настройки FunPay.');
             };
         }
     }
 
-    // Telegram WebApp интеграция (если открыто внутри Telegram)
+    function render() {
+        if (!gameState.gameStarted) {
+            renderStartScreen();
+        } else {
+            renderGame();
+        }
+    }
+
+    // Telegram WebApp
     if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
-        tg.expand(); // разворачиваем на весь экран
+        tg.expand();
         tg.ready();
     }
 
-    // Запуск игры
     loadGame();
-    renderGame();
-    createModal(); // создаём модальное окно заранее
+    render();
+
+    // Модальное окно
+    const modalDiv = document.createElement('div');
+    modalDiv.id = 'modal';
+    modalDiv.className = 'modal';
+    modalDiv.innerHTML = `
+        <div class="modal-content">
+            <div style="font-size: 48px; text-align: center; margin-bottom: 16px;" id="modal-icon">📋</div>
+            <div class="card-type" id="modal-type" style="text-align: center;">улика</div>
+            <h3 id="modal-title" style="text-align: center; margin: 16px 0;">Заголовок</h3>
+            <p id="modal-text" style="line-height: 1.5;">Текст улики</p>
+            <button class="modal-close" id="modalCloseBtn">Закрыть</button>
+        </div>
+    `;
+    document.body.appendChild(modalDiv);
+    document.getElementById('modalCloseBtn').onclick = closeModal;
+    modalDiv.onclick = (e) => { if (e.target === modalDiv) closeModal(); };
 </script>
-<!-- Подключаем Telegram WebApp SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </body>
 </html>
